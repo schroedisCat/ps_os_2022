@@ -1,0 +1,5 @@
+task1a: 
+
+As mentioned in the code the global variable won't change for the main program after using fork() because they are not sharing
+the info of globals. On the other hand, threads have the advantage that they can change the global variable for all other other 
+threads (including the main program).
