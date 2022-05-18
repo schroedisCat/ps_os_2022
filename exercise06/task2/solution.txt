@@ -1,0 +1,4 @@
+Instead of a mutex, could a semaphore be used in this situation? 
+
+I would say no. You need to check if there is an entry available to read, what can be done with one semaphore. 
+The problem is that the buffer isn't safe any more without a mutex and can cause segmentation faults. 

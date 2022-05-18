@@ -1,3 +1,12 @@
 {
+<<<<<<< HEAD
     "makefile.extensionOutputFolder": "./.vscode"
+=======
+    "files.associations": {
+        "pthread.h": "c",
+        "type_traits": "c",
+        "stdio.h": "c",
+        "assert.h": "c"
+    }
+>>>>>>> ccbb8efbc42d899faba47894b0f8b6494dd2cb28
 }

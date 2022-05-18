@@ -1,0 +1,9 @@
+Explain what following commands do: 
+
+<       Redirecting something specified after "<" to something specified before
+
+>       Redirecting something specified before ">" to something specified after
+
+2>      Redirecting Standard error to a file specified after the '>'
+
+2>&1    Redirecting standard error to standard out

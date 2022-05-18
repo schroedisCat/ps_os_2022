@@ -1,0 +1,80 @@
+Explain each of the permissions read, write and execute for both files and directories
+
+read:   can open and read a file;       on directories: it gibes the ability to lists it content
+write   modify a file;                  on directories: add, remove and rename files in it
+execute run a program                   on directories: enter the directories and access to any file inside
+----------------------------------------------------------------------------------------------------
+
+Explain what role the owning user and owning group plays
+
+User: is owner of file (who cretaed it)
+
+Group: multiple users, which you can assign permissions to
+----------------------------------------------------------------------------------------------------
+
+Explain how to read these permission strings (e.g. rw-rw-r--)
+
+this can be split in 3 different parts: 
+
+First 3 char:   User
+Second 3 char:  Group
+Third 3 char:   Other
+
+every group contains up to 3 different letters (in this order): 
+r: read
+w: write
+x: execute 
+
+If there is a '-' there is no permission for this
+
+In our example user and group have read and writing permission, while other only can read. No one can execute. 
+----------------------------------------------------------------------------------------------------
+
+How do these permission strings relate to octal permissions (e.g. 0644)
+
+This group of letters can also be a octal number. The position tells you which Part will get which permission. 
+
+E.g. 
+0 means octal
+6 are the permissions for user (read and write)
+4 are the permissions for group (read)
+4 are the permissions for other (read)
+
+Which number you have to user can be easily found in the web.
+----------------------------------------------------------------------------------------------------
+
+How can you change the permissions of a file?
+
+chmod +x test (for adding executable permission)
+chmod -x test (for removing executable permission)
+
+this can be done with every part and every type: 
+
+e.g chmod g+w test (for adding writing permission to group)
+
+also numbers are available: 
+
+chmod 777 test
+----------------------------------------------------------------------------------------------------
+
+How can you change the permissions of all files within a directory?
+
+chmod -R <permissions> <name of directory> for recursively changing all 
+
+e.g chmod -R g+w task1
+----------------------------------------------------------------------------------------------------
+
+What is the Bash builtin umask about? 
+
+Display or set file mode mask. By default most are using 022 or 002
+----------------------------------------------------------------------------------------------------
+
+The same permission mechanism is also user for other Unix operating system components. Which permissions should you use for an IPC mechanism (like pipe) to prevent other 
+users from interfering with your task in multi-user system? 
+
+I would go with permissions like 0644 so you as user can do everything and all others only can read. Maybe you can also don't let other read when using 0700
+
+Looking at named pipes specifically, what else can you do, apart from setting permissions, to prevent conflicts with other users? 
+
+Take a name nobody may using. E.g. your c-number (pipe_csat8697_user1)
+

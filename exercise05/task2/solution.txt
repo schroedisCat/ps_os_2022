@@ -1,0 +1,46 @@
+What is the difference between shared memory and e.g. a global variable after calling fork()? 
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+What is a race condition? 
+
+    When the result of some code depends on which thread/process was executed first (from the lecture)
+
+-------------------------------------------------------------------------------------------------------------------------------------
+Why do race conditions occur?
+
+    This is a problem when more threads/processes have the same values they want to work with (e.g. our Shared Memory)
+
+-------------------------------------------------------------------------------------------------------------------------------------
+Is the output of a program with a race condition always incorrect?
+
+    No, it can be correct. But you never know when this will happen. 
+-------------------------------------------------------------------------------------------------------------------------------------
+If you run your program 100 times and always get the correct result, does that mean that there is no race condition?
+
+    It depends on the program. Many program will not have problems with race condition because of the implementation. 
+    Others may have, and here race conditions can occur even the program runs 100 time with the correct output.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+What is synchronization?
+
+    A way to avoid race conditions. With synchronization the result should be correct every time because you have a defined behavior
+
+-------------------------------------------------------------------------------------------------------------------------------------
+Why are semaphores well suited for synchronizing producer-consumer patterns? 
+
+    Because if one of the semaphores would get negative (what is not possible) it waits until the other process can synchronize. After that, the 
+    first process can work again.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+There are two ways of creating a POSIX semaphore. Which would you use when?
+    You can have unnamed and named semaphores 
+
+    If you need more semaphores in a program it is probably better to use named ones for better understanding and error handling.
+    If you only have a few, you can do it easily with pointer.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+Could Task 2 also be implemented using a single semaphore? 
+
+    Maybe, but not efficient i would say. Semaphores are only limited when decrementing under 0, not the other way. Thererfor there need to be a way to 
+    limit the upper part as well. 

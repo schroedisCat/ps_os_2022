@@ -1,0 +1,12 @@
+What is the advantage of using a condition variable in this case, 
+compared to using plain mutexes? 
+
+    Because you don't have a busy waiting condition; 
+    You only check once if the Queue is empty and otherwise it waits for the signal.
+
+
+How does the program behavior differ between the two variants? 
+    task3 is far faster than task 2 
+
+    System times:   task2 --> 76,68
+                    task3 --> 19.14
