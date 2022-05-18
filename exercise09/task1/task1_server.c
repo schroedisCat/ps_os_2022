@@ -8,18 +8,11 @@
 #include <pthread.h>
 #include <stdbool.h>
 
+#include "socket.h"
+
 
 #define MAX 128
 
-
-typedef struct socket {
-    int sockfd;
-} socket_t;
-
-
-typedef struct connection {
-    int connfd;
-} connection_t;
 
 void *listener_func(void *ptr);
 void *chat_func(void *ptr);
@@ -86,6 +79,7 @@ void *listener_func(void *ptr) {
             pthread_t client_thread;
             pthread_create(&client_thread, NULL, chat_func, &conn);
             pthread_join(client_thread, NULL);
+            break;
         }
 
     }
