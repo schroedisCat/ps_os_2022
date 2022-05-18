@@ -1,0 +1,13 @@
+Analyze the obtained output: 
+
+When using srand(getpid()) you have different output on every child because they are using different random numbers. The higher S is the closer the 
+results are. The higher N is, the more Child will be made. 
+
+Is the order of the messages consistent? 
+
+NO! The OS can choose which Child (or Parent) it is using next. 
+
+Does it matter whether you do srand(getpid()) before or after the call to fork():
+
+Yes, because it is exactly the same program doubled after fork(). So i you take srand for the fork() the ouput of all childrens of the same row is identical.
+Otherwise it will be changed after it is split up. 
