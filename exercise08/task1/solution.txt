@@ -1,0 +1,8 @@
+System time on home laptop (with count of 2000): 
+
+    task1a: 0,05
+    task1b: 0,03
+
+Before I linked 1a and 1b in one programm, task1a was a lot slower. 
+Thats because you don't need so much threads for the task. 
+Working with a pool is a lot better because you don't have the recources anyway.

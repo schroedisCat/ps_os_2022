@@ -1,0 +1,7 @@
+System time on home laptop:
+
+    Mutex:      10,4 Seconds
+    Atomic:      0,06 Seconds
+
+The atomic variant is a lot faster than the one with mutex. Thats maybe because it is only an integer, which can be accessed only from
+one thread at a time. When using mutex you have a lot more to do background.
