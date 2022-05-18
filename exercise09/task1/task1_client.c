@@ -13,14 +13,16 @@
 #define MAX 128
 
 void *chat(int sockfd);
+void *send_username(int sockfd, char *username);
 
 int main(int argc, char* argv[]) {
 
-    if (argc != 2) {
+    if (argc != 3) {
         perror("No enough arguments\n");
         exit(EXIT_FAILURE);
     }
     int port = strtol(argv[1], NULL, 10);
+    char *username = argv[2];
 
     socket_t sock;
 
@@ -39,6 +41,7 @@ int main(int argc, char* argv[]) {
         printf("connected to server.\n");
     }
 
+    send_username(sock.sockfd, username);
     chat(sock.sockfd);
 
     close(sock.sockfd);
@@ -49,12 +52,13 @@ int main(int argc, char* argv[]) {
 void *chat(int sockfd) {
     char buff[MAX];
     int n;
+    
     while(1) {
         memset(buff, '\0', MAX);
         n = 0;
         while ((buff[n++] = getchar()) != '\n') {}
         write(sockfd, buff, sizeof(buff));
-        if (strncmp("/exit", buff, 5) == 0) {
+        if (strncmp("/quit", buff, 5) == 0) {
             return NULL;
         }
 
@@ -64,4 +68,12 @@ void *chat(int sockfd) {
 
     }
 
+}
+
+void *send_username(int sockfd, char *username) {
+    char buff[MAX] = "User connected\n";
+    
+    write(sockfd, buff, sizeof(buff));
+    
+    return NULL;
 }

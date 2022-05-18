@@ -63,60 +63,82 @@ void *listener_func(void *ptr) {
 
     bool run_server = true;
 
-    while(run_server == true) {
+    while(run_server) {
 
         struct sockaddr_in cli; 
         socklen_t len = sizeof(cli);
 
         connection_t conn;
+        pthread_t client_thread;
 
-        conn.connfd = accept(sock->sockfd, (struct sockaddr *)&cli, &len);
-        if (conn.connfd < 0) {
-            printf("server accept failed.\n");
-            return NULL;
-        } else {
-            printf("server accept the client.\n");
-            pthread_t client_thread;
-            pthread_create(&client_thread, NULL, chat_func, &conn);
-            pthread_join(client_thread, NULL);
+        while(1) {
+            conn.connfd = accept(sock->sockfd, (struct sockaddr *)&cli, &len);
+            if (conn.connfd < 0) {
+                printf("server accept failed.\n");
+                return NULL;
+            } else {
+                printf("server accept the client.\n");
+            
+
+                pthread_create(&client_thread, NULL, chat_func, &conn);
+            }
+        }   
+
+        
+        response_t response;
+        printf("before join\n");
+
+        pthread_join(client_thread, (void **)  &response);
+        //response_t *response = (response_t *) returnValue;
+        printf("after join\n");
+
+        if(response.shutdown) {
+            printf("In response\n");
             break;
         }
+        
+            
+        
 
     }
+
     return NULL;
-    
 }
 
 void *chat_func(void *ptr) {
     connection_t *conn = (connection_t *) ptr;
+    response_t cli_response;
+    char buff[MAX];
 
-     char buff[MAX];
-        while(1) {
-            //sets all chars to \0
-            memset(buff, '\0', MAX);
+    while(1) {
+        //sets all chars to \0
+        memset(buff, '\0', MAX);
 
-            if (read(conn->connfd, buff, sizeof(buff)) == -1) {
-                perror("read\n");
-                exit(EXIT_FAILURE);
-            }
-            printf("Echo: %s\n", buff);
-            
-            //Closes the server
-            if(strncmp("/shutdown", buff, 9) == 0) {
-                printf("Shutting down.\n");
-                close(conn->connfd);
-                return NULL;
-            }
-            //Closes the Connection w/o exiting the server
-            // first strncmp is for strg + ] --> quit in telnet 
-            // second strncmp is a custom exit
-            if (strncmp("", buff, 1) == 0 || strncmp("/exit", buff, 5) == 0) {
-                printf("Closing connection to client\n");
-                printf("Server ready for the next client\n");
-                close(conn->connfd);
-                break;
-            }
-
+        if (read(conn->connfd, buff, sizeof(buff)) == -1) {
+            perror("read\n");
+            exit(EXIT_FAILURE);
         }
-        return NULL;
+        printf("Echo: %s\n", buff);
+            
+        //Closes the server
+        if(strncmp("/shutdown", buff, 9) == 0) {
+            printf("Shutting down.\n");
+            close(conn->connfd);
+            cli_response.shutdown = true;
+            break;
+        }
+        //Closes the Connection w/o exiting the server
+        // first strncmp is for strg + ] --> quit in telnet 
+        // second strncmp is a custom exit
+        if (strncmp("/quit", buff, 5) == 0) {
+            printf("Closing connection to client\n");
+            printf("Server ready for the next client\n");
+            close(conn->connfd);
+            cli_response.shutdown = false;
+            break;
+        }
+
+    }
+    printf("returning things\n");
+    return NULL;
 }

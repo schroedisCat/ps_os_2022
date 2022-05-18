@@ -13,4 +13,8 @@ typedef struct connection {
     int connfd;
 } connection_t;
 
+typedef struct client_response {
+    bool shutdown;
+} response_t;
+
 #endif
