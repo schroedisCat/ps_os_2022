@@ -79,7 +79,7 @@ void *chat(int sockfd, char *username) {
 void *send_username(int sockfd, char *username) {
     char buff[MAX] = "";
     strcat(buff, username);
-    strcat(buff, ": connected\n");
+    strcat(buff, " connected\n");
     
     write(sockfd, buff, sizeof(buff));
     

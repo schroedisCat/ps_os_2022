@@ -50,12 +50,13 @@ int main(int argc, char* argv[]) {
     pthread_create(&listener_thread, NULL, listener_func, &sock);
     pthread_join(listener_thread, NULL);
 
+    printf("Server is shutting down. ");
+    printf("Waiting for %d clients to diconnect.\n", (sock.amount_threads - 1));
+
     for(int i = 0; i < sock.amount_threads; i++) {
-        printf("In pthread_join\n");
         pthread_join(sock.client_threads[i], NULL);
     }
 
-    printf("closing socket\n");
     if (close(sock.sockfd) != 0) {
         perror("close\n");
         exit(EXIT_FAILURE);
@@ -88,13 +89,7 @@ void *listener_func(void *ptr) {
             sock->amount_threads++;
 
         }
-        //response_t *response = calloc(sizeof(response_t), 0);
-        //pthread_join(client_thread, (void **) &response);
-
-        //if(response->shutdown == true) {
-        //    free(response);
-        //    break;
-        //} 
+        
         i++;
     }
 
@@ -114,14 +109,10 @@ void *chat_func(void *ptr) {
             perror("read\n");
             exit(EXIT_FAILURE);
         }
-        printf("%d\n", conn->connfd);
-        printf("%s\n", buff);
             
         //Closes the server
         if(strstr(buff, "/shutdown") != NULL) {
-            printf("Shutting down.\n");
-            printf("Connection Descriptor in Chat: %d\n", conn->connfd);
-
+            printf("User disconnected.\n");
             pthread_cancel(conn->listener_thread);
             close(conn->connfd);
             pthread_exit(NULL);
@@ -131,11 +122,11 @@ void *chat_func(void *ptr) {
         // first strncmp is for strg + ] --> quit in telnet 
         // second strncmp is a custom exit
         if (strstr(buff, "/quit") != NULL) {
-            printf("Closing connection to client\n");
-            printf("Server ready for the next client\n");
+            printf("User disconnected.\n");
             close(conn->connfd);
             break;
         }
+        printf("%s\n", buff);
 
     }
     return NULL;
