@@ -3,6 +3,7 @@
         "pthread.h": "c",
         "type_traits": "c",
         "stdio.h": "c",
-        "assert.h": "c"
+        "assert.h": "c",
+        "stdbool.h": "c"
     }
 }
