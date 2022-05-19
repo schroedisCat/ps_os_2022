@@ -12,7 +12,7 @@
 
 #define MAX 128
 
-void *chat(int sockfd);
+void *chat(int sockfd, char *username);
 void *send_username(int sockfd, char *username);
 
 int main(int argc, char* argv[]) {
@@ -42,27 +42,33 @@ int main(int argc, char* argv[]) {
     }
 
     send_username(sock.sockfd, username);
-    chat(sock.sockfd);
+    chat(sock.sockfd, username);
 
-    close(sock.sockfd);
+    if (close(sock.sockfd) != 0) {
+        perror("close\n");
+        exit(EXIT_FAILURE);
+    };
 
     return EXIT_SUCCESS;
 }
 
-void *chat(int sockfd) {
+void *chat(int sockfd, char *username) {
     char buff[MAX];
     int n;
-    
+    int len_name = strlen(username) + 2;
+
     while(1) {
         memset(buff, '\0', MAX);
-        n = 0;
+        strcat(buff, username);
+        strcat(buff, ": ");
+        n = len_name;
         while ((buff[n++] = getchar()) != '\n') {}
         write(sockfd, buff, sizeof(buff));
-        if (strncmp("/quit", buff, 5) == 0) {
+        if (strstr(buff, "/quit") != NULL) {
             return NULL;
         }
 
-        if (strncmp("/shutdown", buff, 9) == 0) {
+        if (strstr(buff, "/shutdown") != NULL) {
             return NULL;
         }
 
@@ -71,7 +77,9 @@ void *chat(int sockfd) {
 }
 
 void *send_username(int sockfd, char *username) {
-    char buff[MAX] = "User connected\n";
+    char buff[MAX] = "";
+    strcat(buff, username);
+    strcat(buff, ": connected\n");
     
     write(sockfd, buff, sizeof(buff));
     
