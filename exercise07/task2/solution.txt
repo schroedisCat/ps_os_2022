@@ -1,0 +1,7 @@
+System time on home laptop:
+
+    Mutex:      0,18 Seconds
+    Atomic:     0,00 Seconds
+
+Also this time the atomic version is faster than the mutex (according to the output of /usr/bin/time). 
+However, a problem with using atomics in this case is the busy waiting.

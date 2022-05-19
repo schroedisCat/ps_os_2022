@@ -61,43 +61,38 @@ int main(int argc, char* argv[]) {
 void *listener_func(void *ptr) {
     socket_t *sock = (socket_t *)ptr; 
 
-    bool run_server = true;
 
-    while(run_server) {
+    while(1) {
 
         struct sockaddr_in cli; 
         socklen_t len = sizeof(cli);
 
         connection_t conn;
-        pthread_t client_thread;
+        conn.listener_thread = pthread_self();
 
-        while(1) {
-            conn.connfd = accept(sock->sockfd, (struct sockaddr *)&cli, &len);
-            if (conn.connfd < 0) {
-                printf("server accept failed.\n");
-                return NULL;
-            } else {
-                printf("server accept the client.\n");
+        pthread_t client_thread[10];
+        int i = 0;
+
+        conn.connfd = accept(sock->sockfd, (struct sockaddr *)&cli, &len);
+        if (conn.connfd < 0) {
+            printf("server accept failed.\n");
+            return NULL;
+        } else {
+            printf("server accept the client.\n");
             
+            
+            pthread_create(&client_thread[i], NULL, chat_func, &conn);
+            i++;
 
-                pthread_create(&client_thread, NULL, chat_func, &conn);
-            }
-        }   
-
-        
-        response_t response;
-        printf("before join\n");
-
-        pthread_join(client_thread, (void **)  &response);
-        //response_t *response = (response_t *) returnValue;
-        printf("after join\n");
-
-        if(response.shutdown) {
-            printf("In response\n");
-            break;
         }
-        
-            
+
+        //response_t *response = calloc(sizeof(response_t), 0);
+        //pthread_join(client_thread, (void **) &response);
+
+        //if(response->shutdown == true) {
+        //    free(response);
+        //    break;
+        //} 
         
 
     }
@@ -107,7 +102,7 @@ void *listener_func(void *ptr) {
 
 void *chat_func(void *ptr) {
     connection_t *conn = (connection_t *) ptr;
-    response_t cli_response;
+    response_t *cli_response = malloc(sizeof(response_t));
     char buff[MAX];
 
     while(1) {
@@ -123,9 +118,11 @@ void *chat_func(void *ptr) {
         //Closes the server
         if(strncmp("/shutdown", buff, 9) == 0) {
             printf("Shutting down.\n");
-            close(conn->connfd);
-            cli_response.shutdown = true;
-            break;
+            pthread_cancel(conn->listener_thread);
+            pthread_exit(NULL);
+            //close(conn->connfd);
+            //cli_response->shutdown = true;
+            //break;
         }
         //Closes the Connection w/o exiting the server
         // first strncmp is for strg + ] --> quit in telnet 
@@ -134,11 +131,10 @@ void *chat_func(void *ptr) {
             printf("Closing connection to client\n");
             printf("Server ready for the next client\n");
             close(conn->connfd);
-            cli_response.shutdown = false;
+            cli_response->shutdown = false;
             break;
         }
 
     }
-    printf("returning things\n");
-    return NULL;
+    return cli_response;
 }

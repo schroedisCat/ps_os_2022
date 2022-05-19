@@ -11,6 +11,7 @@ typedef struct socket {
 
 typedef struct connection {
     int connfd;
+    pthread_t listener_thread;
 } connection_t;
 
 typedef struct client_response {
