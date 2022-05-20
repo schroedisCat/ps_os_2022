@@ -22,7 +22,6 @@ int main(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
     }
     int port = strtol(argv[1], NULL, 10);
-    printf("%d", port);
     char *username = argv[2];
 
     socket_t sock;
