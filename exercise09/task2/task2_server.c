@@ -137,7 +137,7 @@ void *chat_func(void *ptr) {
         printf("%s\n", buff);
         
         for (int i = 0; i < num_threads; i++) {
-            if (file_descriptors[i] != -1) {
+            if (file_descriptors[i] != -1 && file_descriptors[i] != conn->connfd) {
                 write(file_descriptors[i], buff, sizeof(buff));
             }
         }
