@@ -1,0 +1,6 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/quisi/Documents/Betriebssysteme/ps_os_2022/exercise09/task3'
+cc -std=c11 -Wall -Wextra -Wpedantic -pthread -o task3_server task3_server.c
+cc -std=c11 -Wall -Wextra -Wpedantic -pthread -o task3_client task3_client.c
+make: Leaving directory '/home/quisi/Documents/Betriebssysteme/ps_os_2022/exercise09/task3'
+ 

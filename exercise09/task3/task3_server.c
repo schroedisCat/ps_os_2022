@@ -11,11 +11,12 @@
 #include "socket.h"
 
 #define MAX 128
+#define NAMELEN 20
 
 void *listener_func(void *ptr);
 void *chat_func(void *ptr);
 void rearrange_globals(int connfd);
-void setUsername(char username[20], int connfd);
+void setUsername(char username[NAMELEN], int connfd);
 
 
 usernames_t usernames[AMOUNT_CLIENTS];
@@ -122,8 +123,8 @@ void *chat_func(void *ptr) {
         
         //checks if new user is connected to store its username to the right file descriptor
         if(strstr(buff, "connected") != NULL) {
-            char *messageString = buff;
-            char *newUsername = strtok_r(messageString, " ", &messageString);
+            char newUsername[NAMELEN] = "";
+            sscanf(buff, "%s %*s", newUsername);
             setUsername(newUsername, conn->connfd);
         }
             
@@ -146,21 +147,22 @@ void *chat_func(void *ptr) {
         
         //checks if someone wants to whisper
         if (strstr(buff, "/w ") != NULL) {
-            char* rest = buff;
+            
             char whisperMessage[MAX] = "";
-            char test[MAX] = "";
+            char userToWhisper[NAMELEN] = "";
+            char whisperer[NAMELEN + 1] = "";
+            char message[MAX] = "";
             
-            strcat(test, strtok_r(rest, " ", &rest));
-            strcat(whisperMessage, test);
-            strcat(whisperMessage, "(whispers): ");
-            strtok_r(rest, " ", &rest);
-            char *userToWhisper = strtok_r(rest, " ", &rest);
             
-            strcat(whisperMessage, rest);
+            sscanf(buff, "%s /w %s %s", whisperer, userToWhisper, whisperMessage);
             
+            strcat(message, whisperer);
+            strcat(message, "(whispers): ");
+            strcat(message, whisperMessage);
+                                   
             for (int i = 0; i < num_threads; i++) {
                 if (strcmp(userToWhisper, usernames[i].username) == 0) {
-                    write(usernames[i].connfd, whisperMessage, sizeof(buff));
+                    write(usernames[i].connfd, message, sizeof(message));
                 }
             }
         } else {
