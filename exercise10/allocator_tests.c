@@ -28,6 +28,7 @@ void test_free_list_allocator(void) {
 
 	my_free(ptr1);
 	void* const ptr3 = my_malloc(block_size);
+	printf("ptr3: %p\n", ptr3);
 	memset(ptr3, 0xFF, block_size);
 	printf("ptr3: %p\n", ptr3);
 	assert(ptr1 == ptr3);

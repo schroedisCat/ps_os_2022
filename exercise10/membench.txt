@@ -1,0 +1,16 @@
+task1: 
+
+1 thread(s), 1000 allocations of size 256 - 1024 byte per thread. Avg time per thread:
+        System: 0.33 ms
+        Custom: 2.14 ms
+10 thread(s), 1000 allocations of size 256 - 1024 byte per thread. Avg time per thread:
+        System: 6.71 ms
+        Custom: 21.96 ms
+50 thread(s), 1000 allocations of size 256 - 1024 byte per thread. Avg time per thread:
+        System: 0.94 ms
+        Custom: 45.94 ms
+100 thread(s), 1000 allocations of size 32 - 128 byte per thread. Avg time per thread:
+        System: 0.12 ms
+        Custom: 100.37 ms
+
+Custom is a lot slower than the normal mutex/free. Custom will also get slower with more threads.
