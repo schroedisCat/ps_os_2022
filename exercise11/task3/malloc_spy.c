@@ -14,8 +14,9 @@ void print_number(size_t number) {
 }
 
 void * malloc(size_t size) {
+    write(STDOUT_FILENO, "allocating ", 12);
     print_number(size);
-    write(STDOUT_FILENO, "\t", 1);
+    write(STDOUT_FILENO, " bytes\n", 8);
     
     void *(*original_malloc)(size_t);
     
@@ -29,3 +30,4 @@ void * malloc(size_t size) {
     return (*original_malloc)(size);
 }
 
+// Funktionsaufruf: LD_PRELOAD=./malloc_spy.so /bin/ls

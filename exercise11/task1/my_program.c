@@ -17,3 +17,8 @@ int main(int argc, char* argv[]) {
 
     return EXIT_SUCCESS;
 }
+
+/*
+my_program: my_program.c
+	$(CC) $(CFLAGS) -static -o $@ $^
+*/

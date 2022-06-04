@@ -15,14 +15,32 @@
 -----------------------------------------------------------------------------------------------------------------
 3.) What is the difference between dynamic and static linking?
 
+dynmisch: der Code ist in einem eigenen Binary und wird erst bei Laufzeit gelanden (deshalb auch kleiner)
+statisch: der Code besitzt bereits das finale Binary (demnach größer)
+
 -----------------------------------------------------------------------------------------------------------------
 4.) When would you use the dynamic linking? 
+
+Wenn ich kleinere Programme haben möchte und die notwendigen fragmente erst während der laufzeit laden möchte. 
+Zusätzlich können dynamische Libraries an jeder Adresse liegen.
 
 -----------------------------------------------------------------------------------------------------------------
 5.) When would you use the static linking? 
 
+Wenn ich möchte, dass alles schon zu beginn geladen ist und alles immer an dersleben Adresse liegt. 
+Ein weiterer Vorteil ist auch, dass nur mehr das geladen wird, was benötigt wird. Somit ist man unabhängiger vom System. 
+Static Linking sollte auch insgesamt schneller sein als Dynamic Linking da nicht immer nach den Adressen gesucht werden muss.
+
 -----------------------------------------------------------------------------------------------------------------
 6.) What is position independent code, and why is it useful? 
 
+Code muss an jeder virtuellen Adresse auszuführen sein. Um das zu gewährleisten git es diesen Typ. 
+Wenn während Runtime erst das Linking passiert könnte es nicht von mehreren Programmen 
+gleichzeitig verwendet werden. 
+
 -----------------------------------------------------------------------------------------------------------------
 7.) What is the purpose of the LD_LIBRARY_PATH environment variable?
+
+Damit wird festgelegt, von wo das Programm die Shared Libraries beziehen soll. Per Default sollte diese Variable 
+keinen Inhalt haben. Diese Variable kann aber vom Nutzer gesetzt werden. Das ist z.B. eben bei task1 notwendig, da 
+sonst das Shared Library nicht verwendet werden würde.
