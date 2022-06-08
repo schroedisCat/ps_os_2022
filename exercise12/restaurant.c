@@ -61,11 +61,11 @@ int main(int argc, char* argv[]) {
     cook_info cooks_info[number_of_cooks];
     guest_info guests_info[number_of_guests];
 
-    //initializising of the Queues
+    //initializing of the Queues
     myqueue_init(&queue_counter);
     myqueue_init(&queue_order);
 
-    //initializising for the mutexes and cond_variables
+    //initializing for the mutexes and cond_variables
     //if the method don't return 0 there is an error
     if(pthread_mutex_init(&mutex_counter, NULL) != 0) {
         printf("Mutex init failed\n");
@@ -261,7 +261,7 @@ void *cook_meal(void *ptr) {
             pthread_cond_wait(&counter_cond, &mutex_counter);
         }
         myqueue_push(&queue_counter, order_nr);
-        
+
         // with notifications a signal will be send to the right guest condition variable
         if (notifications_enabled == true) {
             pthread_cond_signal(&info->guests_info[order_nr].guest_cond_var);
