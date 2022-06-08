@@ -3,6 +3,7 @@
 #include <sys/mman.h>
 #include <string.h>
 #include <pthread.h>
+#include <stdbool.h>
 
 #include "allocator_tests.h"
 #include "membench.h"
@@ -15,14 +16,14 @@ void my_allocator_destroy(void);
 
 
 typedef struct Node {
-    struct Node* before;
     struct Node* next;
+    bool allocated;
     size_t size;
     //__uint8_t *block;
 } node_t;
 
 node_t *begin;
-node_t *next_free;
+node_t *first_free;
 
 size_t overall_size;
 
@@ -37,62 +38,83 @@ void *my_malloc(size_t size) {
     if (size > overall_size) {
         return NULL;
     }
-    //wenn die noch nichts allociert ist dann split zum ersten mal
-    if (next_free == begin) {
-        printf("in next_free == begin\n");
-        next_free->size = size;
-        next_free->next = (node_t *) ((__uint8_t *) next_free + sizeof(node_t*) + size);
-        
-        next_free = next_free->next;
-        next_free->before = begin;
-        next_free->next = NULL;
-        //printf("begin: %p\n", (void*) begin);
-        //printf("next_free->before: %p\n", (void *) next_free->before);
-        //printf("next_free: %p\n", (void *)next_free);
-        //printf("start of storage: %p\n", (void *) begin);
-        //return ((__uint8_t *) next_free->before + sizeof(node_t));
-        return next_free->before;
-    }
-    //ansonsten überprüfe ALLE freien speicherbereiche
-    //setze den bereich für size an die richtige stelle 
-    //und schmeiß den block aus dem free raus 
-    node_t *next_free_tmp = next_free;
-    node_t *best_fit;
-    while(next_free_tmp != NULL) {
-        if (next_free_tmp->next == NULL) {
-            printf("in next_free_tmp->next == NULL\n");
-            printf("%ld\n", sizeof(node_t *));
-            next_free_tmp->next =  (node_t *) ((__uint8_t *) next_free + sizeof(node_t*) + size);
-            node_t *before_next_free_tmp = next_free_tmp->before;
-            next_free->size = size;
-            next_free = next_free_tmp;
-            next_free->before = before_next_free_tmp;
-            next_free->next = NULL;
+    //ansonsten überprüfe ALLE speicherbereiche auf den best möglichsten speicherplatz
+    //setze den bereich für size an die richtige stelle  
+    node_t *next_free_tmp = first_free;
+    node_t *best_fit = first_free;
+    size_t best_fit_size = first_free->size;
+    //node_t *ptr_to_header_before = NULL;
 
-            return next_free;
+    
+    while(next_free_tmp != NULL) {
+
+        //addresses lookin good
+        printf("my_malloc: %p where block starts at: %p  and ->next: %p\n", (void *) next_free_tmp, (void *) ((__uint8_t *) next_free_tmp + sizeof(node_t*)),  (void *) next_free_tmp->next);
+        if (next_free_tmp->next == NULL) {
+            node_t* address_header_tmp = best_fit;
+
+            best_fit->size = size;
+            best_fit->allocated = true;
+            best_fit->next = (node_t *) ((__uint8_t *) best_fit + sizeof(node_t*) + size);
+
+            //if(ptr_to_header_before != NULL) {
+            //    ptr_to_header_before->next = best_fit;
+            //}
+            
+            if (first_free == best_fit) {
+                first_free = first_free->next;
+            }
+                
+            //first_free->next = NULL;
+            __uint8_t* address_block_tmp = ((__uint8_t *) address_header_tmp) + sizeof(node_t *);
+            return address_block_tmp;
         } else {
+            if (next_free_tmp->allocated == false) {
+                if (next_free_tmp->size < best_fit_size && next_free_tmp->size >= size) {
+                    best_fit_size = next_free_tmp->size;
+                    best_fit = next_free_tmp;
+                }
+            }
 
         }
+    
         next_free_tmp = next_free_tmp->next;
     }
     
+    return NULL;
 }
 
 void my_free(void *ptr) {
-    printf("my_free for %p\n", ptr);
-    node_t *ptr_node = (node_t *) ((__uint8_t *)ptr - sizeof(node_t *));
-    printf("start of storage at %p\n", (void *) begin);
-    printf("header is at %p\n", (void *)ptr_node);
-    if (ptr_node->before != NULL && ptr_node->before->size != 0) {
-        printf("checkt if there is a node before\n");
-        ptr_node->size += ptr_node->before->size;
-        ptr_node = ptr_node->before;
-        
+    node_t *ptr_header = (node_t *) ((__uint8_t *)ptr - sizeof(node_t *));
+        printf("my_free for %p (block_adress) where ->next: %p\n", ptr, (void *) ptr_header->next);
+
+    if (ptr_header < first_free) {
+        printf("check this shit\n");
+        ptr_header->next = first_free->next;
+        printf("ptr_header->next: %p and first_free->next: %p\n", (void*)ptr_header->next, (void*)first_free->next);
+        first_free = ptr_header;
+        return;
+    } else {
+        printf("else this fun\n");
+        //get not allocated block before ptr
+        node_t *free_tmp = first_free;
+        node_t *ptr_to_header_before = first_free;
+
+        while(free_tmp != NULL) {
+            if (free_tmp == ptr_header) {
+                if (ptr_to_header_before != NULL && ptr_to_header_before->allocated == false) {
+                    free_tmp->size += ptr_to_header_before->size;
+                }
+            }
+            ptr_to_header_before = free_tmp;
+            free_tmp = free_tmp->next;
+        }
     }
-    if (ptr_node->next != NULL &&  ptr_node->next->size != 0) {
-        printf("check if there is a next node\n");
-        ptr_node->size += ptr_node->next->size;
-        ptr_node->next = (node_t *) ((__uint8_t *)ptr_node->next + ptr_node->next->size);
+
+    if (ptr_header->next != NULL && ptr_header->next->allocated == false) {
+        //printf("check if there is a next node\n");
+        ptr_header->size += ptr_header->next->size;
+        ptr_header->next = (node_t *) ((__uint8_t *)ptr_header->next + ptr_header->next->size);
     }
     
 
@@ -101,7 +123,9 @@ void my_free(void *ptr) {
 void my_allocator_init(size_t size) {
     begin = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     overall_size = size;
-    next_free = begin;
+    first_free = begin;
+    first_free->next = NULL;
+    first_free->allocated = false;
 }
 
 void my_allocator_destroy(void) {
