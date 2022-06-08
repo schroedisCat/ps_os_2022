@@ -20,12 +20,12 @@ void * malloc(size_t size) {
     
     void *(*original_malloc)(size_t);
     
-        *(void **) (&original_malloc) = dlsym(RTLD_NEXT, "malloc");
-        char *error = dlerror();
-        if (error != NULL) {
-            fprintf(stderr, "%s\n", error);
-            exit(EXIT_FAILURE);
-        }
+    *(void **) (&original_malloc) = dlsym(RTLD_NEXT, "malloc");
+    char *error = dlerror();
+    if (error != NULL) {
+        fprintf(stderr, "%s\n", error);
+        exit(EXIT_FAILURE);
+    }
     
     return (*original_malloc)(size);
 }
